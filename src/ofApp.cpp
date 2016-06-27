@@ -14,7 +14,7 @@ void ofApp::setup(){
 
 	finder.setup("haarcascade_frontalface_default.xml");
 
-	//set amount of framees before forgetting something.
+	//set amount of frames before forgetting something.
 	finder.getTracker().setPersistence(15);
 	// an object can move up to 32 pixels per frame
 	finder.getTracker().setMaximumDistance(32);
@@ -45,24 +45,22 @@ void ofApp::draw(){
 
 	// draw the whole finder
 	ofPushMatrix();
+		//ofset drawing position
 		ofTranslate(20, 20);
 		// No parameters in draw function
-		finder.draw();
+		ofSetColor(255);
+		//finder.draw();
 
 		// or, instead we can draw each blob individually from the blobs vector,
 		for (int i = 0; i < finder.size(); i++){
-			/*
-			ofPoint center = toOf(finder.getCentroid(i));
-			// cv::Point2f center = finder.getCentroid(i);
-        
-			ofDrawEllipse(center, 2, 2);
+			ofRectangle tempRect = finder.getObject(i);
+			ofDrawRectangle(tempRect);
 
 			int label = finder.getLabel(i);
 			int age = finder.getTracker().getAge(label);
-
+			ofPoint center = tempRect.getCenter();
 			ofSetColor(255, 0, 0);
-			ofDrawBitmapString(ofToString(label), center.x + 2, center.y + 2);
-			*/
+			ofDrawBitmapString(ofToString(label), center.x, center.y);
 		}
 
 	ofPopMatrix();
