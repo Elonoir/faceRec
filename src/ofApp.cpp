@@ -33,10 +33,10 @@ void ofApp::update(){
 
 	// if new image check for faces.
 	if (vidGrabber.isFrameNew()){
+
         colorImg.setFromPixels(vidGrabber.getPixels());
 
 		finder.update(colorImg);
-
 		RectTracker& results = finder.getTracker();
 
 		for (size_t i = 0; i < finder.size(); i++)
