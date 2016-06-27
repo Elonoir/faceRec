@@ -22,7 +22,8 @@ class ofApp : public ofBaseApp{
 		void mouseExited(int x, int y);
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);		
+		void gotMessage(ofMessage msg);	
+		void saveScreen();
 
 
 		ofVideoGrabber 			vidGrabber;
@@ -32,5 +33,7 @@ class ofApp : public ofBaseApp{
         ofxCv::ObjectFinder 	finder;
 
 		int 				threshold;
+		unsigned long		frameCounter;
+		bool				captured;
 };
 

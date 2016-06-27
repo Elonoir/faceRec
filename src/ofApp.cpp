@@ -23,10 +23,12 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	//Draw background
-	ofBackground(100,100,100);
+	ofBackground(100, 100, 100);
 
 	// check for new img in cam
     vidGrabber.update();
+	captured = true;
+
 	// if new image check for faces.
 	if (vidGrabber.isFrameNew()){
         colorImg.setFromPixels(vidGrabber.getPixels());
@@ -38,16 +40,17 @@ void ofApp::update(){
 		{
 			//Get label belonging to current index
 			int label = results.getLabelFromIndex(i);
-
+			unsigned int age = results.getAge(label);
 			//If detected face is older than xx frames save an mugshot
-			if (results.getAge(label) > 16) {
+			if (age > 16) {
 				ofRectangle curFace = finder.getObject(i);
 				ofImage cropFace;
 				cropFace.cropFrom(colorImg, curFace.x, curFace.y, curFace.getWidth(), curFace.getHeight());
 				//cropFace.saveImage(x + "a.jpg", OF_IMAGE_QUALITY_MEDIUM);
-				cropFace.saveImage("/mugshots/" + ofToString(label) + "/ " + ".png");
-			}
+				cropFace.saveImage("/mugshots/" + ofToString(label) + "/ " + ofToString(age + ".png");
 
+				if (!captured) saveScreen();
+			}
 		}
 	}
 }
@@ -145,6 +148,12 @@ void ofApp::windowResized(int w, int h){
 //--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
 
+}
+
+void ofApp::saveScreen()
+{
+	colorImg.saveImage("/screenshots/" + ofToString(frameCounter) + ".png");
+	captured = true;
 }
 
 //--------------------------------------------------------------
