@@ -8,7 +8,7 @@ void ofApp::setup(){
 
 	vidGrabber.setVerbose(true);
     vidGrabber.setup(320,240);
-    colorImg.allocate(320,240);
+    //colorImg.allocate(320,240);
 
 	threshold = 80;
 
@@ -29,10 +29,26 @@ void ofApp::update(){
     vidGrabber.update();
 	// if new image check for faces.
 	if (vidGrabber.isFrameNew()){
-
         colorImg.setFromPixels(vidGrabber.getPixels());
 
 		finder.update(colorImg);
+
+		RectTracker& results = finder.getTracker();
+		for (size_t i = 0; i < finder.size(); i++)
+		{
+			//Get label belonging to current index
+			int label = results.getLabelFromIndex(i);
+
+			//If detected face is older than xx frames save an mugshot
+			if (results.getAge(label) > 16) {
+				ofRectangle curFace = finder.getObject(i);
+				ofImage cropFace;
+				cropFace.cropFrom(colorImg, curFace.x, curFace.y, curFace.getWidth(), curFace.getHeight());
+				//cropFace.saveImage(x + "a.jpg", OF_IMAGE_QUALITY_MEDIUM);
+				cropFace.saveImage("/mugshots/" + ofToString(label) + "/ " + ".png");
+			}
+
+		}
 	}
 }
 
@@ -48,21 +64,25 @@ void ofApp::draw(){
 		//ofset drawing position
 		ofTranslate(20, 20);
 		// No parameters in draw function
-		ofSetColor(255);
 		//finder.draw();
 
 		// or, instead we can draw each blob individually from the blobs vector,
 		for (int i = 0; i < finder.size(); i++){
-			ofRectangle tempRect = finder.getObject(i);
-			ofDrawRectangle(tempRect);
+			ofRectangle curFace = finder.getObject(i);
+			ofSetColor(255);
+			ofNoFill();
+			ofDrawRectangle(curFace);
 
 			int label = finder.getLabel(i);
 			int age = finder.getTracker().getAge(label);
-			ofPoint center = tempRect.getCenter();
+			ofPoint center = curFace.getCenter();
+
+			//Draw marker
+			ofFill();
+			ofDrawRectangle(center.x - 5, center.y - 15, 20, 20);
 			ofSetColor(255, 0, 0);
 			ofDrawBitmapString(ofToString(label), center.x, center.y);
 		}
-
 	ofPopMatrix();
 
 }

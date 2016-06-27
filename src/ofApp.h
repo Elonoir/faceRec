@@ -26,7 +26,8 @@ class ofApp : public ofBaseApp{
 
 
 		ofVideoGrabber 			vidGrabber;
-        ofxCvColorImage			colorImg;
+        //ofxCvColorImage			colorImg;
+		ofImage					colorImg;
 
         ofxCv::ObjectFinder 	finder;
 
