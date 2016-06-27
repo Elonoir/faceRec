@@ -4,6 +4,7 @@
 
 #include "ofxOpenCv.h"
 #include "ofxCv.h"
+#include "face.h"
 
 class ofApp : public ofBaseApp{
 
@@ -23,17 +24,20 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);	
+
 		void saveScreen();
+		void newPhoto(ofRectangle curFace, int label, int age);
 
 
 		ofVideoGrabber 			vidGrabber;
-        //ofxCvColorImage			colorImg;
+        //ofxCvColorImage		colorImg;
 		ofImage					colorImg;
 
         ofxCv::ObjectFinder 	finder;
 
-		int 				threshold;
-		unsigned long		frameCounter;
-		bool				captured;
+		int 					threshold;
+		unsigned long			frameCounter;
+		bool					captured;
+		std::map<int, face>		faces;
 };
 
