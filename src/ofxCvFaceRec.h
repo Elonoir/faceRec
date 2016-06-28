@@ -41,8 +41,6 @@ public:
 	~ofxCvFaceRec();
 
     // public methods
-    int loadFaceImgArray(char * filename);
-    void learn();
     bool isTrained() { return trained; };
 
     int recognize(ofxCvGrayscaleImage img);
@@ -69,7 +67,7 @@ public:
 
 	//Added / not on the original file
 	void loadImagesFromDir(vector<string>files);
-	void learn(string path);
+	void learn(vector<string> files);
 	
 protected:
 

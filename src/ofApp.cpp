@@ -17,15 +17,16 @@ void ofApp::setup(){
 	finder.getTracker().setPersistence(15);
 	// an object can move up to 32 pixels per frame
 	finder.getTracker().setMaximumDistance(32);
-
-	//Setup the face recognition
-	//rec.learn();// Learn facefinder with the possible faces
+	
 	//Allocate the files needed for the recognition
 	gray.allocate(PCA_WIDTH, PCA_HEIGHT); //
 	color.allocate(PCA_WIDTH, PCA_HEIGHT); //
 	
 	//Get path to all the different mugshots
 	filepaths = getFilepaths();
+
+	//Setup the face recognition
+	rec.learn(filepaths);// Learn facefinder with the possible faces
 }
 
 //--------------------------------------------------------------

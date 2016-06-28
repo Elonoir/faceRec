@@ -15,15 +15,11 @@ ofxCvFaceRec::ofxCvFaceRec() {
 ofxCvFaceRec::~ofxCvFaceRec() {
 }
 
-void ofxCvFaceRec::learn(string path) {
+void ofxCvFaceRec::learn(vector<string> files) {
 
 	int i, offset;
 
 	// load training data
-
-	vector<string> files;
-	files.push_back("mugshots/18.jpg");
-	files.push_back("mugshots/44.jpg");
 	loadImagesFromDir(files);
 
 	nTrainFaces = faces.size();
@@ -63,8 +59,7 @@ void ofxCvFaceRec::learn(string path) {
 
 
 void ofxCvFaceRec::loadImagesFromDir(vector<string>files) {
-
-
+	if (!faces.empty()) faces.clear();
 
 	if (files.size() <= 0) return;
 
@@ -113,42 +108,6 @@ void ofxCvFaceRec::loadImagesFromDir(vector<string>files) {
 		}
 
 	}
-}
-
-void ofxCvFaceRec::learn() {
-    int i, offset;	
-
-    // load training data
-    nTrainFaces = loadFaceImgArray("train.txt");
-    if( nTrainFaces < 2 )
-    {
-		printf("Need 2 or more training faces\n"
-				"Input file contains only %d\n", nTrainFaces);
-		return;
-    }
-
-    // do PCA on the training faces
-    doPCA();
-
-    // project the training images onto the PCA subspace
-    projectedTrainFaceMat = cvCreateMat( nTrainFaces, nEigens, CV_32FC1 );
-    offset = projectedTrainFaceMat->step / sizeof(float);
-    for(i=0; i<nTrainFaces; i++)
-    {
-        //int offset = i * nEigens;
-        cvEigenDecomposite(
-            faceImgArr[i],
-            nEigens,
-            eigenVectArr,
-            0, 0,
-            pAvgTrainImg,
-            projectedTrainFaceMat->data.fl + i*nEigens);
-            //projectedTrainFaceMat->data.fl + i*offset);
-    }
-    // store the recognition data as an xml file
-    storeTrainingData();
-
-    trained=true;
 }
 
 void ofxCvFaceRec::mask(ofxCvGrayscaleImage img) {
@@ -407,98 +366,6 @@ int ofxCvFaceRec::findNearestNeighbor(float * projectedTestFace) {
     //printf("leastDistSq: %03d -> %f\n", iNearest, leastDistSq);
 
     return iNearest;
-}
-
-int ofxCvFaceRec::loadFaceImgArray(char * filename) {
-    FILE * imgListFile = 0;
-    char imgFilename[512];
-    char Buf[512];
-    int iFace, nFaces=0;
-	ofImage img;
-
-    string fileName = ofToDataPath(filename);
-
-    // open the input file
-    if( !(imgListFile = fopen(fileName.c_str(), "r")) )
-    {
-        fprintf(stderr, "Can\'t open file %s\n", fileName.c_str());
-        //return 0;
-    } else {
-
-        // count the number of faces
-        while( fgets(imgFilename, 512, imgListFile) ) {
-            ++nFaces;
-        };
-        rewind(imgListFile);
-    }
-
-    // allocate the face-image array and person number matrix
-    faceImgArr        = (IplImage **)cvAlloc( nFaces*sizeof(IplImage *) );
-    personNumTruthMat = cvCreateMat( 1, nFaces, CV_32SC1 );
-
-    if(!faces.empty()) faces.clear();
-
-    // store the face images in an array
-    for(iFace=0; iFace<nFaces; iFace++)
-    {
-        // read image name from file
-        fgets(imgFilename, 512, imgListFile);
-        printf("imgFilename: %s", imgFilename);
-
-        string temp = imgFilename;
-        temp = "faces/"+temp;
-
-        string inImage = ofToDataPath(temp);
-        inImage = inImage.substr(0, inImage.length()-1);
-
-        //strcpy(imgFilename, ofToDataPath(files[iFace]).c_str());
-
-        *(personNumTruthMat->data.i+iFace)= iFace+1;
-
-        if (img.loadImage(inImage) == false) {
-            printf("Can\'t load image from %s\n", inImage.c_str());
-            return 0;
-        }
-
-        img.resize(PCA_WIDTH, PCA_HEIGHT);
-        img.update();
-
-        ofxCvGrayscaleImage gray;
-        ofxCvColorImage color;
-
-        switch(img.getImageType()) {
-            case OF_IMAGE_GRAYSCALE:
-                gray.allocate(img.getWidth(), img.getHeight());
-                gray = img.getPixels();//color;
-                break;
-            case OF_IMAGE_COLOR:
-            case OF_IMAGE_COLOR_ALPHA:
-                color.allocate(img.getWidth(),img.getHeight());
-                color = img.getPixels();
-                gray.allocate(img.getWidth(), img.getHeight());
-                gray = color;
-                break;
-            case OF_IMAGE_UNDEFINED:
-                printf("Image is of unknown type, %s\n", imgFilename);
-                return 0;
-        };
-
-        //img.draw(200+iFace*100, 200);//, 50, 50);
-        //color.draw(200+iFace*100, 300);//, 50, 50);
-        //gray.draw(200+iFace*100, 400);//, 50, 50);
-
-        // add gray image to array of training images
-        //gray.contrastStretch();
-        faces.push_back(gray);
-        color_faces.push_back(color);
-
-        IplImage *im8 = gray.getCvImage();
-        faceImgArr[iFace] = cvCloneImage(im8);
-    }
-
-    fclose(imgListFile);
-
-    return nFaces;
 }
 
 void ofxCvFaceRec::draw(int x, int y)
