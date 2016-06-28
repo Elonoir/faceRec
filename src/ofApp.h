@@ -26,19 +26,28 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);	
 
+		//Methods specifically for this sketch
 		void saveScreen();
+		void addFace(int label);
 		void newPhoto(ofRectangle curFace, int label, int age);
+		vector<string> getFilepaths();
 
-
+		//variables for video and image data
 		ofVideoGrabber 			vidGrabber;
-        //ofxCvColorImage		colorImg;
 		ofImage					colorImg;
 
+		//Finders for faces and image recognition
         ofxCv::ObjectFinder 	finder;
+		ofxCvFaceRec			rec;
+		//Variables used during recognition of face
+		ofxCvColorImage			color;
+		ofxCvGrayscaleImage		gray;
 
+		//Variables for my own way of working
 		int 					threshold;
-		unsigned long			frameCounter;
+		unsigned long			framecount;
 		bool					captured;
+		vector<string>			filepaths;
 		std::map<int, face>		faces;
 };
 

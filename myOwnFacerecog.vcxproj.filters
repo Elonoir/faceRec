@@ -70,6 +70,9 @@
     <ClCompile Include="src\face.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ofxCvFaceRec.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -756,6 +759,9 @@
       <Filter>addons\ofxOpenCv\libs\opencv\include\opencv2\videostab</Filter>
     </ClInclude>
     <ClInclude Include="src\face.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ofxCvFaceRec.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
