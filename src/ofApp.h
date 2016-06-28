@@ -4,6 +4,7 @@
 
 #include "ofxOpenCv.h"
 #include "ofxCv.h"
+#include "ofxCvFaceRec.h"
 #include "face.h"
 
 class ofApp : public ofBaseApp{
