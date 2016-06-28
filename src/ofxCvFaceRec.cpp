@@ -15,6 +15,106 @@ ofxCvFaceRec::ofxCvFaceRec() {
 ofxCvFaceRec::~ofxCvFaceRec() {
 }
 
+void ofxCvFaceRec::learn(string path) {
+
+	int i, offset;
+
+	// load training data
+
+	vector<string> files;
+	files.push_back("mugshots/18.jpg");
+	files.push_back("mugshots/44.jpg");
+	loadImagesFromDir(files);
+
+	nTrainFaces = faces.size();
+	//loadFaceImgArray("train.txt");
+
+	if (nTrainFaces < 2)
+	{
+		printf("Need 2 or more training faces\n"
+			"Input file contains only %d\n", nTrainFaces);
+		return;
+	}
+
+	// do PCA on the training faces
+	doPCA();
+
+	// project the training images onto the PCA subspace
+	projectedTrainFaceMat = cvCreateMat(nTrainFaces, nEigens, CV_32FC1);
+	offset = projectedTrainFaceMat->step / sizeof(float);
+	for (i = 0; i<nTrainFaces; i++)
+	{
+		//int offset = i * nEigens;
+		cvEigenDecomposite(
+			faceImgArr[i],
+			nEigens,
+			eigenVectArr,
+			0, 0,
+			pAvgTrainImg,
+			projectedTrainFaceMat->data.fl + i*nEigens);
+		//projectedTrainFaceMat->data.fl + i*offset);
+	}
+	// store the recognition data as an xml file
+	storeTrainingData();
+
+	trained = true;
+
+}
+
+
+void ofxCvFaceRec::loadImagesFromDir(vector<string>files) {
+
+
+
+	if (files.size() <= 0) return;
+
+	faceImgArr = (IplImage **)cvAlloc(files.size() * sizeof(IplImage *));
+	personNumTruthMat = cvCreateMat(1, files.size(), CV_32SC1);
+
+	for (int i = 0; i < files.size(); i++) {
+
+		ofImage img;
+		img.load(files[i]);
+		img.resize(PCA_WIDTH, PCA_HEIGHT);
+		img.update();
+
+		ofxCvGrayscaleImage gray;
+		ofxCvColorImage color;
+
+		bool bFound = true;
+
+		switch (img.getImageType()) {
+		case OF_IMAGE_GRAYSCALE:
+			gray.allocate(img.getWidth(), img.getHeight());
+			gray = img.getPixels();//color;
+			break;
+		case OF_IMAGE_COLOR:
+		case OF_IMAGE_COLOR_ALPHA:
+			color.allocate(img.getWidth(), img.getHeight());
+			color = img.getPixels();
+			gray.allocate(img.getWidth(), img.getHeight());
+			gray = color;
+			break;
+		case OF_IMAGE_UNDEFINED:
+			//printf("Image is of unknown type, %s\n", imgFilename);
+			bFound = false;
+			continue;
+		};
+
+
+		if (bFound) {
+
+			faces.push_back(gray);
+			color_faces.push_back(color);
+
+			int iFace = faces.size() - 1;
+			IplImage *im8 = gray.getCvImage();
+			faceImgArr[iFace] = cvCloneImage(im8);
+		}
+
+	}
+}
+
 void ofxCvFaceRec::learn() {
     int i, offset;	
 

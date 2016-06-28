@@ -66,6 +66,10 @@ public:
     int numPeople() { return nTrainFaces; };
     
     std::vector<float> getSimilarities(ofxCvGrayscaleImage img);
+
+	//Added / not on the original file
+	void loadImagesFromDir(vector<string>files);
+	void learn(string path);
 	
 protected:
 
