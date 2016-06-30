@@ -15,12 +15,9 @@ ofxCvFaceRec::ofxCvFaceRec() {
 ofxCvFaceRec::~ofxCvFaceRec() {
 }
 
-void ofxCvFaceRec::learn(vector<string> files) {
+void ofxCvFaceRec::learn() {
 
 	int i, offset;
-
-	// load training data
-	loadImagesFromDir(files);
 
 	nTrainFaces = faces.size();
 	//loadFaceImgArray("train.txt");
@@ -54,6 +51,60 @@ void ofxCvFaceRec::learn(vector<string> files) {
 	storeTrainingData();
 
 	trained = true;
+
+}
+
+void ofxCvFaceRec::addFaces(vector<string> files)
+{
+	if (files.size() <= 0) return;
+
+	for (int i = 0; i < files.size(); i++) {
+
+		ofImage img;
+		img.load(files[i]);
+		img.resize(PCA_WIDTH, PCA_HEIGHT);
+		img.update();
+
+		ofxCvGrayscaleImage gray;
+		ofxCvColorImage color;
+
+		bool bFound = true;
+
+		switch (img.getImageType()) {
+		case OF_IMAGE_GRAYSCALE:
+			gray.allocate(img.getWidth(), img.getHeight());
+			gray = img.getPixels();//color;
+			break;
+		case OF_IMAGE_COLOR:
+		case OF_IMAGE_COLOR_ALPHA:
+			color.allocate(img.getWidth(), img.getHeight());
+			color = img.getPixels();
+			gray.allocate(img.getWidth(), img.getHeight());
+			gray = color;
+			break;
+		case OF_IMAGE_UNDEFINED:
+			//printf("Image is of unknown type, %s\n", imgFilename);
+			bFound = false;
+			continue;
+		};
+
+
+		if (bFound) {
+
+			faces.push_back(gray);
+			color_faces.push_back(color);
+
+		}
+	}
+
+	//reallocate based on total
+	faceImgArr			= (IplImage **)cvAlloc(faces.size() * sizeof(IplImage *));
+	personNumTruthMat	= cvCreateMat(1, faces.size(), CV_32SC1);
+	for (size_t i = 0; i < faces.size(); i++)
+	{
+		IplImage* im8	= faces[i].getCvImage();
+		faceImgArr[i]	= cvCloneImage(im8);
+	}
 
 }
 

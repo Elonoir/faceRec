@@ -67,7 +67,8 @@ public:
 
 	//Added / not on the original file
 	void loadImagesFromDir(vector<string>files);
-	void learn(vector<string> files);
+	void learn();
+	void addFaces(vector<string>files);
 	
 protected:
 
