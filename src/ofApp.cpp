@@ -5,9 +5,8 @@ using namespace ofxCv;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
 	vidGrabber.setVerbose(true);
-    vidGrabber.setup(320,240);
+	vidGrabber.setup(320, 240);
 
 	threshold = 80;
 
@@ -26,7 +25,8 @@ void ofApp::setup(){
 	filepaths = getFilepaths();
 
 	//Setup the face recognition
-	rec.learn(filepaths);// Learn facefinder with the possible faces
+	rec.loadImagesFromDir(filepaths);
+	rec.learn();// Learn facefinder with the possible faces
 }
 
 //--------------------------------------------------------------
@@ -61,9 +61,11 @@ void ofApp::update(){
 					//Create new photo
 					newPhoto(finder.getObject(i), label, age);
 			}
+			
 		}
 
 		//Get number of closest matching photograph // not ID yet
+		gray = colorImg;
 		int person = rec.recognize(gray);
 		cout << "Best match: " << person << endl;
 	}
@@ -73,6 +75,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	ofSetBackgroundColor(0);
 
 	ofPushMatrix();
 		////ofset drawing position
@@ -110,6 +113,10 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+	if (key == 'f') {
+		fullscreen = !fullscreen;
+		ofSetFullscreen(!fullscreen);
+	};
 
 	switch (key){
 		case '+':

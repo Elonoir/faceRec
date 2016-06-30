@@ -35,6 +35,8 @@ class ofApp : public ofBaseApp{
 		//variables for video and image data
 		ofVideoGrabber 			vidGrabber;
 		ofImage					colorImg;
+		// Variables for display
+		bool					fullscreen;
 
 		//Finders for faces and image recognition
         ofxCv::ObjectFinder 	finder;
